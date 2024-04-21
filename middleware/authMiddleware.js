@@ -1,19 +1,20 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/user');
 
-const authMiddleware = async (req, res, next) => {
+const authMiddleware = (req, res, next) => {
+  const token = req.header('Authorization');
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
   try {
-    const token = req.header('Authorization').replace('Bearer ', '');
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findOne({ _id: decoded.userId });
-    if (!user) {
-      throw new Error();
-    }
-    req.user = user;
+    req.user = decoded.user;
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Unauthorized' });
+    return res.status(401).json({ message: 'Unauthorized' });
   }
+
+  return undefined; // Add return statement
 };
 
 module.exports = authMiddleware;

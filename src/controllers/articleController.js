@@ -1,20 +1,21 @@
-const Article = require("../models/article");
+const Article = require('../models/article');
 
-// Get all articles saved by the user
-const getAllArticles = async (req, res) => {
+exports.getSavedArticles = async (req, res) => {
   try {
-    const articles = await Article.find({ owner: req.user._id });
+    const userId = req.user.id;
+    const articles = await Article.find({ owner: userId });
     res.json(articles);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: 'Server Error' });
   }
 };
 
-// Create an article
-const createArticle = async (req, res) => {
+exports.createArticle = async (req, res) => {
   try {
-    const { keyword, title, text, date, source, link, image } = req.body;
-    const article = new Article({
+    const {
+      keyword, title, text, date, source, link, image,
+    } = req.body;
+    const newArticle = new Article({
       keyword,
       title,
       text,
@@ -22,29 +23,22 @@ const createArticle = async (req, res) => {
       source,
       link,
       image,
-      owner: req.user._id,
+      owner: req.user.id,
     });
-    await article.save();
-    res.status(201).json(article);
+    const savedArticle = await newArticle.save();
+    res.status(201).json(savedArticle);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: 'Server Error' });
   }
 };
 
-// Delete an article by ID
-const deleteArticle = async (req, res) => {
+exports.deleteArticle = async (req, res) => {
   try {
-    const article = await Article.findOneAndDelete({
-      _id: req.params.articleId,
-      owner: req.user._id,
-    });
-    if (!article) {
-      return res.status(404).json({ message: "Article not found" });
-    }
-    res.json({ message: "Article deleted successfully" });
+    const userId = req.user.id;
+    const { articleId } = req.params;
+    await Article.findOneAndDelete({ _id: articleId, owner: userId });
+    res.status(204).end();
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: 'Server Error' });
   }
 };
-
-module.exports = { getAllArticles, createArticle, deleteArticle };
