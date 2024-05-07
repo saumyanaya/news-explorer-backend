@@ -4,7 +4,7 @@ This is the README for my awesome API!
 
 ## Accessing the API
 
-You can access the API at [api.saumya.jumpingcrab.com][www.saumya.jumpingcrab.com][https://api.saumya.jumpingcrab.com].
+You can access the API at [api.saumya.jumpingcrab.com][www.saumya.jumpingcrab.com][saumya.jumpingcrab.com].
 
 ## Endpoints
 

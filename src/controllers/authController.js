@@ -6,11 +6,8 @@ const { NODE_ENV, JWT_SECRET } = require("../../utils/config");
 exports.signup = async (req, res) => {
   try {
     const { email, password, name } = req.body;
-
-    console.log("user email is : " + email);
     // Check if user with provided email already exists
     let user = await User.findOne({ email });
-    console.log("user  is : " + user);
     if (user) {
       return res.status(400).json({ message: "User already exists" });
     }
