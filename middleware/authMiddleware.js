@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../utils/config");
 
 const authMiddleware = (req, res, next) => {
   const token = req.header("Authorization");
@@ -7,14 +8,14 @@ const authMiddleware = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded.user;
     next();
   } catch (error) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  return undefined; // Add return statement
+  return next(); // Add return statement
 };
 
 module.exports = authMiddleware;

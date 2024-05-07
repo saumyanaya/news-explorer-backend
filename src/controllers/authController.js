@@ -1,13 +1,16 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const { NODE_ENV, JWT_SECRET } = require("../../utils/config");
 
 exports.signup = async (req, res) => {
   try {
     const { email, password, name } = req.body;
 
+    console.log("user email is : " + email);
     // Check if user with provided email already exists
     let user = await User.findOne({ email });
+    console.log("user  is : " + user);
     if (user) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -48,14 +51,19 @@ exports.signin = async (req, res) => {
     }
 
     // Generate JWT
+
     const payload = {
       user: {
-        id: user.id,
+        _id: user._id,
       },
     };
     try {
       const token = await new Promise(() => {
-        jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
+        jwt.sign(
+          payload,
+          NODE_ENV === "production" ? JWT_SECRET : "super-strong-secret",
+          { expiresIn: "7d" },
+        );
       });
 
       return res.json({ token });

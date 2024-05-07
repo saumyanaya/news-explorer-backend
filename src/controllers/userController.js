@@ -4,6 +4,6 @@ exports.getUserInfo = async (req, res) => {
     const { email, name } = req.user;
     res.json({ email, name });
   } catch (error) {
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message: "Server Error" });
   }
 };
