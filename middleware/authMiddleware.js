@@ -1,21 +1,29 @@
 const jwt = require("jsonwebtoken");
-const { JWT_SECRET } = require("../utils/config");
 
-const authMiddleware = (req, res, next) => {
-  const token = req.header("Authorization");
-  if (!token) {
-    return res.status(401).json({ message: "Unauthorized" });
+const { JWT_SECRET, NODE_ENV } = require("../utils/config");
+
+const { UnauthorizedError } = require("../utils/UnauthorizedError");
+
+module.exports = (req, res, next) => {
+  const { authorization } = req.headers;
+
+  if (!authorization || !authorization.startsWith("Bearer ")) {
+    next(new UnauthorizedError("Authorization Required"));
+    return;
   }
+
+  const token = authorization.replace("Bearer ", "");
+  let payload;
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded.user;
-    next();
-  } catch (error) {
-    return res.status(401).json({ message: "Unauthorized" });
+    payload = jwt.verify(
+      token,
+      NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
+    );
+  } catch (err) {
+    next(new UnauthorizedError("Authorization Required"));
+    return;
   }
-
-  return next(); // Add return statement
+  req.user = payload;
+  return next();
 };
-
-module.exports = authMiddleware;

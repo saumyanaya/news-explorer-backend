@@ -1,41 +1,59 @@
-// app.js (or index.js)
-
 const express = require("express");
+
 const mongoose = require("mongoose");
+
 const helmet = require("helmet");
+
 const cors = require("cors");
+
 require("dotenv").config();
 
-const errorMiddleware = require("./middleware/errorMiddleware");
+const limiter = require("./utils/rateLimiter");
+
+const errorHandler = require("./middleware/errorHandler");
+
 const userRoutes = require("./src/routes/userRoutes");
-const authRoutes = require("./src/routes/authRoutes");
+
+const index = require("./src/routes/index");
+
 const articleRoutes = require("./src/routes/articleRoutes");
-const { signin, signup } = require("./src/controllers/authController");
+
+const { errorLogger, requestLogger } = require("./middleware/logger");
+
+const { MONGO_DB_CONNECTION } = require("./utils/config");
 
 const app = express();
-mongoose.set("strictQuery", false);
-mongoose.connect("mongodb://127.0.0.1:27017/mydatabase");
+
+app.get("/crash-test", () => {
+  setTimeout(() => {
+    throw new Error("Server will crash now");
+  }, 0);
+});
+
+mongoose.set("strictQuery", true);
+
+mongoose.connect(MONGO_DB_CONNECTION);
+
 app.use(cors());
+
 app.use(express.json());
 
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'none'"],
-        imgSrc: ["'self'"], // Allow loading images from the same origin
-      },
-    },
-  }),
-);
-app.post("/signin", signin);
+app.use(limiter);
 
-app.post("/signup", signup);
-app.use(errorMiddleware);
-app.use(authRoutes);
+app.use(helmet());
+
+app.use(errorHandler);
+
+app.use(index);
+
 app.use(userRoutes);
+
 app.use(articleRoutes);
 
-const { PORT = 3001 } = process.env;
+app.use(errorLogger);
 
+app.use(requestLogger);
+
+// Start server
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {});
