@@ -13,14 +13,14 @@ router.get("/articles", authMiddleware, articleController.getSavedArticles);
 router.post(
   "/articles",
   authMiddleware,
-  articleController.createArticle,
   validateCreateArticle,
+  articleController.createArticle,
 );
 router.delete(
   "/articles/:articleId",
   authMiddleware,
-  articleController.deleteArticle,
   validateId,
+  articleController.deleteArticle,
 );
 
 module.exports = router;

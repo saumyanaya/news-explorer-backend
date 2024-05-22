@@ -8,15 +8,14 @@ const cors = require("cors");
 
 require("dotenv").config();
 
+const { errors } = require("celebrate");
 const limiter = require("./utils/rateLimiter");
 
 const errorHandler = require("./middleware/errorHandler");
 
-const userRoutes = require("./src/routes/userRoutes");
+const routes = require("./src/routes");
 
 const index = require("./src/routes/index");
-
-const articleRoutes = require("./src/routes/articleRoutes");
 
 const { errorLogger, requestLogger } = require("./middleware/logger");
 
@@ -42,17 +41,17 @@ app.use(limiter);
 
 app.use(helmet());
 
-app.use(errorHandler);
+app.use(requestLogger);
 
 app.use(index);
 
-app.use(userRoutes);
-
-app.use(articleRoutes);
+app.use(routes);
 
 app.use(errorLogger);
 
-app.use(requestLogger);
+app.use(errors());
+
+app.use(errorHandler);
 
 // Start server
 const PORT = process.env.PORT || 3001;
