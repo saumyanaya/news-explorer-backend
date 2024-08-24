@@ -6,7 +6,7 @@ This stage involves building the back-end for your full-stack application or New
 Frontend- https://github.com/saumyanaya/news-explorer-frontend, 
 Backened- https://github.com/saumyanaya/news-explorer-backend,       Demo- https://www.youtube.com/watch?v=5UReYgK-gA4
 
-## This stage, you'll be using the following technologies:
+## Technologies:
 
 Node.js - To create the server and handle back-end logic.
 Express.js - For building the API and managing routes and middleware.
